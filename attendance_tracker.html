@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>University Attendance Tracker</title>
+<style>
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#172033;background:#f4f7fb;--bg:#f4f7fb;--surface:#fff;--surface2:#f8fafc;--text:#172033;--muted:#64748b;--border:#e2e8f0;--shadow:0 8px 26px #0f172a0b;--accent:#175cd3;--accent-soft:#eaf1ff;--accent-text:#174ea6;--green-bg:#eaf8ee;--green:#237a3b;--blue-bg:#eaf1ff;--blue:#245fc4;--red-bg:#fff0f0;--red:#b42318}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0b1020;--surface:#121a2c;--surface2:#182238;--text:#edf2ff;--muted:#9eabc4;--border:#283650;--shadow:0 12px 34px #0004;--accent:#7c9cff;--accent-soft:#202f53;--accent-text:#c5d4ff;--green-bg:#163527;--green:#81e0a0;--blue-bg:#1a2d4b;--blue:#9fc2ff;--red-bg:#44232b;--red:#ffabb5}
+*{box-sizing:border-box}body{margin:0;padding:24px;background:radial-gradient(ellipse at 10% 0%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 38%),var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
+main{max-width:1100px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;animation:rise .55s both}
+h1{font-size:28px;margin:0 0 7px;letter-spacing:-.4px}.sub{color:var(--muted);margin:0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:var(--shadow);transition:background .3s,border-color .3s,transform .25s;animation:rise .55s both}.panel:hover{border-color:color-mix(in srgb,var(--accent) 38%,var(--border))}
+.upload{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+button,.filelabel{border:1px solid transparent;border-radius:11px;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer;transition:transform .18s,filter .18s,box-shadow .18s,background .25s;color:inherit}button:hover,.filelabel:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 7px 18px #00000012}button:active,.filelabel:active{transform:scale(.98)}button:focus-visible,.filelabel:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:2px}
+.primary{background:linear-gradient(135deg,#3978ef,#6549dc);color:white}.secondary{background:var(--accent-soft);color:var(--accent-text);border-color:color-mix(in srgb,var(--accent) 16%,transparent)}.danger{background:var(--red-bg);color:var(--red)}.filelabel{background:var(--accent-soft);color:var(--accent-text);display:inline-block;border-color:color-mix(in srgb,var(--accent) 16%,transparent)}
+input[type=file]{display:none}input[type=search],select{font:inherit;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);min-width:180px;transition:border-color .2s,background .2s}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;animation:rise .6s .06s both}
+.stat{border-radius:16px;padding:17px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s}.stat:hover{transform:translateY(-4px);box-shadow:0 14px 28px #00000012}.stat:after{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:currentColor;opacity:.55}.stat .num{font-size:32px;font-weight:800;margin:8px 0;animation:countPop .35s}.stat small{color:var(--muted)}
+.stat.uni{background:var(--green-bg);color:var(--green);border-color:color-mix(in srgb,var(--green) 24%,var(--border))}.stat.place{background:var(--blue-bg);color:var(--blue);border-color:color-mix(in srgb,var(--blue) 24%,var(--border))}.stat.absent{background:var(--red-bg);color:var(--red);border-color:color-mix(in srgb,var(--red) 24%,var(--border))}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}.tablewrap{overflow:auto;border-radius:12px}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--border)}th{background:var(--surface2);color:var(--muted);font-size:14px}td{background:var(--surface);transition:background .2s}tbody tr{animation:fadeIn .25s both}tbody tr:hover td{background:color-mix(in srgb,var(--accent) 5%,var(--surface))}tr:last-child td{border-bottom:0}
+.status{font:inherit;border:1px solid var(--border);border-radius:9px;padding:8px;width:100%;max-width:190px;background:var(--surface);color:var(--text)}
+.empty{text-align:center;color:var(--muted);padding:35px}.note{font-size:13px;color:var(--muted);line-height:1.7}.toast{margin-top:10px;color:var(--green);font-weight:700}
+footer{margin:28px auto 8px;text-align:center;color:var(--muted);font-size:13px;line-height:1.9;animation:fadeIn .9s both}footer strong{color:var(--text)}.footer-en{font-size:12px;letter-spacing:.2px}.heart{display:inline-block;color:#f05b78;animation:heartbeat 1.8s infinite}
+@keyframes rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes countPop{0%{transform:scale(.88);opacity:.5}100%{transform:scale(1);opacity:1}}@keyframes heartbeat{0%,100%{transform:scale(1)}12%{transform:scale(1.18)}24%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(max-width:600px){body{padding:12px}h1{font-size:23px}.stats{grid-template-columns:1fr}.stat{padding:13px}.stat .num{font-size:27px}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div><h1>University Attendance Tracker</h1><p class="sub">Import your student list, update attendance statuses, and export the results.</p></div>
+    <div class="tools"><button class="secondary" id="themeToggle" aria-label="Toggle theme">🌙 Dark Mode</button></div>
+  </header>
+  <section class="panel upload">
+    <div><strong>1) Import students from Excel</strong><p class="note">Supports .xlsx, .xls, and .csv files. If needed, you will be asked to choose the column containing student names.</p></div>
+    <div class="tools"><label class="filelabel" for="fileInput">Choose Excel File</label><input id="fileInput" type="file" accept=".xlsx,.xls,.csv"></div>
+  </section>
+  <section class="stats" aria-live="polite">
+    <div class="stat uni"><div>🎓 At University</div><div class="num" id="countUni">0</div><small>students</small></div>
+    <div class="stat place"><div>📍 Going to Location</div><div class="num" id="countPlace">0</div><small>students</small></div>
+    <div class="stat absent"><div>✕ Absent</div><div class="num" id="countAbsent">0</div><small>students</small></div>
+  </section>
+  <section class="panel" style="margin-top:16px">
+    <div class="controls">
+      <div><strong>2) Student List</strong><div class="note" id="totalLabel">Total students: 0</div></div>
+      <div class="tools">
+        <input type="search" id="search" placeholder="Search by name..." aria-label="Search by name">
+        <select id="filter" aria-label="Filter by status">
+          <option value="all">All statuses</option><option value="uni">At University</option><option value="place">Going to Location</option><option value="absent">Absent</option><option value="unset">Not Set</option>
+        </select>
+      </div>
+    </div>
+    <div class="tablewrap"><table><thead><tr><th style="width:65px">#</th><th>Student Name</th><th>Status</th></tr></thead><tbody id="tbody"><tr><td colspan="3" class="empty">Upload an Excel file to display students here.</td></tr></tbody></table></div>
+    <div class="controls" style="margin-top:16px;margin-bottom:0">
+      <div class="tools"><button class="secondary" id="markUnset">Reset Visible to Not Set</button><button class="danger" id="clearAll">Clear List</button></div>
+      <div class="tools"><button class="primary" id="exportBtn">Export Formatted Excel Report</button></div>
+    </div>
+    <div class="note" id="message" role="status"></div>
+  </section>
+  <p class="note">Privacy & saving: Attendance changes are not saved automatically. Export Formatted Excel Report to keep your results. Reloading the page may clear the current list. Avoid uploading sensitive data you do not need.</p>
+  <footer>
+    <div>Developed &amp; Designed by <strong>Mos3ab El-Refa3y</strong></div>
+    <div>All Rights Reserved © <span id="year"></span></div>
+    <div>Made with care <span class="heart">♥</span></div>
+  </footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const statuses = {
+  unset: 'Not Set',
+  uni: 'At University',
+  place: 'Going to Location',
+  absent: 'Absent'
+};
+let students = [];
+const $ = id => document.getElementById(id);
+$('year').textContent = new Date().getFullYear();
+const themeKey = 'attendance-theme';
+function setTheme(theme, save=false){
+  document.documentElement.dataset.theme=theme;
+  $('themeToggle').textContent=theme==='dark'?'☀️ Light Mode':'🌙 Dark Mode';
+  $('themeToggle').setAttribute('aria-pressed',String(theme==='dark'));
+  if(save){try{localStorage.setItem(themeKey,theme);}catch(_e){}}
+}
+let initialTheme='light';
+try{initialTheme=localStorage.getItem(themeKey)==='dark'?'dark':'light';}catch(_e){}
+setTheme(initialTheme);
+$('themeToggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function updateStats(){
+  $('countUni').textContent=students.filter(s=>s.status==='uni').length;
+  $('countPlace').textContent=students.filter(s=>s.status==='place').length;
+  $('countAbsent').textContent=students.filter(s=>s.status==='absent').length;
+  $('totalLabel').textContent=`Total students: ${students.length} | Not set: ${students.filter(s=>s.status==='unset').length}`;
+}
+function render(){
+  updateStats();
+  const q=$('search').value.trim().toLocaleLowerCase();
+  const f=$('filter').value;
+  const rows=students.map((s,i)=>({...s,index:i})).filter(s=>(!q||s.name.toLocaleLowerCase().includes(q))&&(f==='all'||s.status===f));
+  if(!rows.length){
+    $('tbody').innerHTML=`<tr><td colspan="3" class="empty">${students.length?'No matching results.':'Upload an Excel file to display students here.'}</td></tr>`;
+    return;
+  }
+  $('tbody').innerHTML=rows.map(s=>`<tr><td>${s.index+1}</td><td>${esc(s.name)}</td><td><select class="status" data-index="${s.index}" aria-label="Status for ${esc(s.name)}">${Object.entries(statuses).map(([v,label])=>`<option value="${v}" ${s.status===v?'selected':''}>${label}</option>`).join('')}</select></td></tr>`).join('');
+}
+$('tbody').addEventListener('change',e=>{
+  if(e.target.matches('select[data-index]')){
+    students[Number(e.target.dataset.index)].status=e.target.value;
+    render();
+  }
+});
+$('search').addEventListener('input',render);
+$('filter').addEventListener('change',render);
+$('fileInput').addEventListener('change',async e=>{
+  const file=e.target.files[0]; if(!file)return;
+  try{
+    if(!window.XLSX) throw new Error('The Excel library could not load. Check your internet connection and refresh the page.');
+    const data=await file.arrayBuffer();
+    const wb=XLSX.read(data,{type:'array'});
+    const sheet=wb.Sheets[wb.SheetNames[0]];
+    const matrix=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''});
+    if(!matrix.length) throw new Error('The file is empty.');
+    const first=matrix[0].map(v=>String(v).trim());
+    let headerIndex=first.findIndex(v=>/اسم|name|student/i.test(v));
+    let headers=headerIndex>=0?matrix[headerIndex].map(v=>String(v).trim()):first;
+    let colIndex=headers.findIndex(v=>/اسم|name|student/i.test(v));
+    let start=headerIndex>=0?headerIndex+1:0;
+    if(colIndex<0){
+      const candidates=first.map((v,i)=>({label:v||`Column ${i+1}`,value:String(i)}));
+      const chosen=prompt('Enter the number of the column containing student names (A=1, B=2, C=3...)\\n'+candidates.map((c,i)=>`${i+1}: ${c.label}`).join('\\n'),'1');
+      if(chosen===null)return;
+      colIndex=Number(chosen)-1;
+      if(!Number.isInteger(colIndex)||colIndex<0||colIndex>=matrix[0].length)throw new Error('Invalid column number.');
+    }
+    const imported=matrix.slice(start).map(r=>String(r[colIndex]??'').trim()).filter(n=>n);
+    if(!imported.length)throw new Error('No student names were found in the selected column.');
+    if(students.length && !confirm(`Replace the current list with ${imported.length} imported students? Any unsaved status changes in the current list will be lost.`)) return;
+    students=imported.map(name=>({name,status:'unset'}));
+    $('search').value='';$('filter').value='all';
+    $('message').textContent=`Imported ${students.length} students from: ${file.name}`;
+    render();
+  }catch(err){alert(err.message||'An error occurred while reading the file.');}
+  finally{e.target.value='';}
+});
+$('exportBtn').addEventListener('click',()=>{
+  if(!students.length){alert('Please import a student list first.');return;}
+  if(!window.XLSX){alert('The Excel library could not be loaded. Check your internet connection and try again.');return;}
+
+  const counts = {
+    university: students.filter(s=>s.status==='uni').length,
+    location: students.filter(s=>s.status==='place').length,
+    absent: students.filter(s=>s.status==='absent').length,
+    pending: students.filter(s=>s.status==='unset').length
+  };
+  const total = students.length;
+  const pct = n => total ? n/total : 0;
+  const now = new Date();
+  const dateText = now.toLocaleDateString('en-GB');
+
+  // Dashboard sheet
+  const dash = [
+    ['UNIVERSITY ATTENDANCE TRACKER','','','',''],
+    ['Attendance Summary', `Generated: ${dateText}`,'','',''],
+    ['Metric','Students','Percentage','',''],
+    ['At University',counts.university,pct(counts.university),'',''],
+    ['Going to Location',counts.location,pct(counts.location),'',''],
+    ['Absent',counts.absent,pct(counts.absent),'',''],
+    ['Not Set',counts.pending,pct(counts.pending),'',''],
+    ['TOTAL STUDENTS',total,1,'',''],
+    ['','','','',''],
+    ['Attendance Status','Count','Share','',''],
+    ['At University',counts.university,pct(counts.university),'',''],
+    ['Going to Location',counts.location,pct(counts.location),'',''],
+    ['Absent',counts.absent,pct(counts.absent),'',''],
+    ['Not Set',counts.pending,pct(counts.pending),'',''],
+    ['','','','',''],
+    ['ATTENDANCE CHART (BAR VIEW)','','','',''],
+    ['At University', '█'.repeat(Math.min(35,Math.round(pct(counts.university)*35))), '', '', ''],
+    ['Going to Location', '█'.repeat(Math.min(35,Math.round(pct(counts.location)*35))), '', '', ''],
+    ['Absent', '█'.repeat(Math.min(35,Math.round(pct(counts.absent)*35))), '', '', ''],
+    ['Not Set', '█'.repeat(Math.min(35,Math.round(pct(counts.pending)*35))), '', '', ''],
+    ['','','','',''],
+    ['Notes','Update attendance in the web app and export again to refresh this report.','','','']
+  ];
+  const wsDash = XLSX.utils.aoa_to_sheet(dash);
+  wsDash['!cols']=[{wch:28},{wch:38},{wch:16},{wch:4},{wch:4}];
+  wsDash['!merges']=[{s:{r:0,c:0},e:{r:0,c:2}},{s:{r:1,c:1},e:{r:1,c:2}},{s:{r:15,c:1},e:{r:15,c:4}}];
+  wsDash['!rows']=[{hpt:32},{hpt:23},{hpt:24},{hpt:23},{hpt:23},{hpt:23},{hpt:23},{hpt:28},{hpt:10},{hpt:24}];
+
+  // Student register sheet
+  const registerRows = [['No.','Student Name','Attendance Status','Status Code']];
+  students.forEach((s,i)=>registerRows.push([
+    i+1,
+    s.name,
+    statuses[s.status],
+    s.status==='uni'?'AT UNIVERSITY':s.status==='place'?'GOING TO LOCATION':s.status==='absent'?'ABSENT':'NOT SET'
+  ]));
+  const wsList = XLSX.utils.aoa_to_sheet(registerRows);
+  wsList['!cols']=[{wch:8},{wch:34},{wch:25},{wch:24}];
+  wsList['!autofilter']={ref:`A1:D${registerRows.length}`};
+  wsList['!freeze']={xSplit:0,ySplit:1};
+  wsList['!rows']=[{hpt:26}];
+
+  // Style workbook cells. SheetJS community edition writes basic styles in supported builds.
+  const styleCell = (ws, addr, style) => { if(ws[addr]) ws[addr].s=style; };
+  const titleStyle={font:{name:'Aptos Display',sz:18,bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'172554'}},alignment:{vertical:'center',horizontal:'left'}};
+  const sectionStyle={font:{name:'Aptos',sz:11,bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'2563EB'}},alignment:{vertical:'center'}};
+  const headerStyle={font:{name:'Aptos',sz:11,bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'334155'}},alignment:{vertical:'center',wrapText:true},border:{bottom:{style:'medium',color:{rgb:'93C5FD'}}}};
+  const labelStyle={font:{name:'Aptos',sz:11,color:{rgb:'1E293B'}},fill:{fgColor:{rgb:'F1F5F9'}},alignment:{vertical:'center'}};
+  const totalStyle={font:{name:'Aptos',sz:12,bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'0F766E'}},alignment:{vertical:'center'}};
+  const pctStyle={numFmt:'0.0%',font:{name:'Aptos',sz:11,color:{rgb:'1E293B'}},alignment:{horizontal:'center'}};
+  ['A1','B1','C1'].forEach(a=>styleCell(wsDash,a,titleStyle));
+  ['A2','B2','A3','B3','C3','A10','B10'].forEach(a=>styleCell(wsDash,a,sectionStyle));
+  for(let r=4;r<=7;r++){
+    styleCell(wsDash,`A${r}`,labelStyle);
+    styleCell(wsDash,`B${r}`,{font:{name:'Aptos',sz:12,bold:true,color:{rgb:'0F172A'}},alignment:{horizontal:'center'}});
+    styleCell(wsDash,`C${r}`,pctStyle);
+  }
+  ['A8','B8','C8'].forEach(a=>styleCell(wsDash,a,totalStyle));
+  for(let r=11;r<=14;r++){
+    styleCell(wsDash,`A${r}`,labelStyle);
+    styleCell(wsDash,`B${r}`,{font:{name:'Aptos',sz:12,bold:true,color:{rgb:'0F172A'}},alignment:{horizontal:'center'}});
+    styleCell(wsDash,`C${r}`,pctStyle);
+  }
+  ['A17','B17'].forEach(a=>styleCell(wsDash,a,sectionStyle));
+  const chartColors=['16A34A','2563EB','DC2626','D97706'];
+  for(let r=18;r<=21;r++){
+    styleCell(wsDash,`A${r}`,labelStyle);
+    styleCell(wsDash,`B${r}`,{font:{name:'Consolas',sz:12,bold:true,color:{rgb:chartColors[r-18]}},alignment:{horizontal:'left'}});
+  }
+  for(let r=1;r<registerRows.length;r++){
+    for(const col of ['A','B','C','D']){
+      const addr=`${col}${r+1}`;
+      styleCell(wsList,addr,{font:{name:'Aptos',sz:10,color:{rgb:'1E293B'}},fill:{fgColor:{rgb:r%2===0?'F8FAFC':'FFFFFF'}},alignment:{vertical:'center'}});
+    }
+    const status=s=>s==='uni'?'DCFCE7':s==='place'?'DBEAFE':s==='absent'?'FEE2E2':'FEF3C7';
+    const row=students[r-1];
+    const fill=status(row.status);
+    ['C','D'].forEach(col=>styleCell(wsList,`${col}${r+1}`,{font:{name:'Aptos',sz:10,bold:true,color:{rgb:row.status==='uni'?'166534':row.status==='place'?'1D4ED8':row.status==='absent'?'B91C1C':'92400E'}},fill:{fgColor:{rgb:fill}},alignment:{vertical:'center'}}));
+  }
+  ['A1','B1','C1','D1'].forEach(a=>styleCell(wsList,a,headerStyle));
+
+  // In-sheet bar visualization works in standard XLSX exports without chart extensions.
+
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,wsDash,'Dashboard');
+  XLSX.utils.book_append_sheet(wb,wsList,'Attendance List');
+  try {
+    XLSX.writeFile(wb,'University_Attendance_Report.xlsx');
+    $('message').textContent='Formatted attendance report exported.';
+  } catch(err) {
+    // Some SheetJS builds do not support embedded charts; export the formatted tables regardless.
+    alert('The report could not be exported. Please try again. '+(err.message||''));
+  }
+});
+$('markUnset').addEventListener('click',()=>{
+  const q=$('search').value.trim().toLocaleLowerCase(),f=$('filter').value;
+  students.forEach(s=>{if((!q||s.name.toLocaleLowerCase().includes(q))&&(f==='all'||s.status===f))s.status='unset';});
+  $('message').textContent='Visible students have been reset to Not Set.';render();
+});
+$('clearAll').addEventListener('click',()=>{
+  if(confirm('Clear all student names and statuses?')){students=[];$('message').textContent='The list has been cleared.';render();}
+});
+render();
+</script>
+</body>
+</html>
